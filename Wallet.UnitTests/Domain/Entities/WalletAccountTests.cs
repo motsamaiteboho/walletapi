@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Domain.Entities;
+using Wallet.Domain.Exceptions;
 
 namespace Wallet.UnitTests.Domain.Entities
 {
@@ -54,7 +55,7 @@ namespace Wallet.UnitTests.Domain.Entities
                 "ZAR");
 
             // Act
-            var exception = Assert.Throws<InvalidOperationException>(
+            var exception = Assert.Throws<InsufficientFundsException>(
                 () => wallet.Withdraw(1000.01m));
 
             // Assert
@@ -107,7 +108,7 @@ namespace Wallet.UnitTests.Domain.Entities
                 "ZAR");
 
             // Act
-            Assert.Throws<InvalidOperationException>(
+            Assert.Throws<InsufficientFundsException>(
                 () => wallet.Withdraw(1500.00m));
 
             // Assert

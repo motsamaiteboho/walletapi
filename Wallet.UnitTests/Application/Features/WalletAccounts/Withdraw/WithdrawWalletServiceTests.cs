@@ -8,6 +8,7 @@ using Wallet.Application.Abstractions;
 using Wallet.Application.Events;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
 using Wallet.Domain.Entities;
+using Wallet.Domain.Exceptions;
 
 namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
 {
@@ -133,7 +134,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             var request = new WithdrawWalletRequest(1500.00m);
 
             // Act
-            await Assert.ThrowsAsync<InvalidOperationException>(
+            await Assert.ThrowsAsync<InsufficientFundsException>(
                 () => service.ExecuteAsync(
                     WalletId,
                     request));
