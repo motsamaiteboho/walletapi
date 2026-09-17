@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
+using Wallet.Application.Features.WalletAccounts.Withdraw;
 
 namespace Wallet.Application
 {
@@ -14,7 +15,7 @@ namespace Wallet.Application
             this IServiceCollection services)
         {
             services.AddScoped<GetWalletBalanceService>();
-
+            services.AddScoped<WithdrawWalletService>();
             return services;
         }
     }
