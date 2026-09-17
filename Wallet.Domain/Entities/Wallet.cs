@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wallet.Domain.Exceptions;
 
 namespace Wallet.Domain.Entities
 {
@@ -58,8 +59,7 @@ namespace Wallet.Domain.Entities
 
             if (amount > Balance)
             {
-                throw new InvalidOperationException(
-                    "Insufficient funds.");
+                throw new InsufficientFundsException();
             }
 
             Balance -= amount;
