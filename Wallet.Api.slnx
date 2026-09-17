@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="Wallet.UnitTests/Wallet.UnitTests.csproj" />
+  </Folder>
+  <Project Path="Wallet.Api/Wallet.Api.csproj" />
+  <Project Path="Wallet.Application/Wallet.Application.csproj" />
+  <Project Path="Wallet.Domain/Wallet.Domain.csproj" />
+  <Project Path="Wallet.Infrastructure/Wallet.Infrastructure.csproj" />
+</Solution>
