@@ -29,6 +29,9 @@ namespace Wallet.Infrastructure.Persistence.Configurations
 
             builder.Property(account => account.CreatedAt)
                 .IsRequired();
+
+            builder.Property(account => account.Version)
+                .IsRowVersion();
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Wallet.Domain.Entities
 
         public DateTime CreatedAt { get; private set; }
 
+        public uint Version { get; private set; }
+
         private WalletAccount()
         {
             // Required by EF Core

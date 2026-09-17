@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Wallet.Application.Exceptions;
 using Wallet.Domain.Exceptions;
 
 namespace Wallet.Api.Exceptions
@@ -31,6 +32,9 @@ namespace Wallet.Api.Exceptions
                 ArgumentException =>
                     StatusCodes.Status400BadRequest,
 
+                WalletConcurrencyException =>
+                    StatusCodes.Status409Conflict,
+
                 _ =>
                     StatusCodes.Status500InternalServerError
             };
@@ -42,6 +46,9 @@ namespace Wallet.Api.Exceptions
                 {
                     StatusCodes.Status400BadRequest =>
                         "Invalid request.",
+
+                    StatusCodes.Status409Conflict =>
+                        "Wallet was modified concurrently.",
 
                     StatusCodes.Status422UnprocessableEntity =>
                         "Withdrawal could not be completed.",
