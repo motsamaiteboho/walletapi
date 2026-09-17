@@ -3,6 +3,7 @@
     <File Path="docker-compose.yml" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="Wallet.IntegrationTests/Wallet.IntegrationTests.csproj" Id="0349df5b-2cb9-4644-89a5-5517676ea1b8" />
     <Project Path="Wallet.UnitTests/Wallet.UnitTests.csproj" />
   </Folder>
   <Project Path="Wallet.Api/Wallet.Api.csproj" />
