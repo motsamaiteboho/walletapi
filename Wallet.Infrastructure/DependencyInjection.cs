@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
+using Wallet.Infrastructure.Events;
 using Wallet.Infrastructure.Persistence;
 using Wallet.Infrastructure.Repositories;
 
@@ -28,6 +29,8 @@ namespace Wallet.Infrastructure
             services.AddScoped<
                 IWalletAccountRepository,
                 WalletAccountRepository>();
+
+            services.AddScoped<IEventPublisher,InMemoryEventPublisher>();
 
             return services;
         }

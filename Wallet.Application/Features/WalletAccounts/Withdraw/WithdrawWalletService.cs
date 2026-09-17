@@ -4,17 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
+using Wallet.Application.Events;
 
 namespace Wallet.Application.Features.WalletAccounts.Withdraw
 {
     public class WithdrawWalletService
     {
         private readonly IWalletAccountRepository _repository;
+        private readonly IEventPublisher _eventPublisher;
 
         public WithdrawWalletService(
-            IWalletAccountRepository repository)
+            IWalletAccountRepository repository,
+            IEventPublisher eventPublisher)
         {
             _repository = repository;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<WithdrawWalletResponse?> ExecuteAsync(
@@ -35,6 +39,17 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             walletAccount.Withdraw(request.Amount);
 
             await _repository.SaveChangesAsync(
+                cancellationToken);
+
+            var withdrawalEvent = new WalletWithdrawalEvent(
+                walletAccount.Id,
+                request.Amount,
+                walletAccount.Balance,
+                walletAccount.Currency,
+                DateTime.UtcNow);
+
+            await _eventPublisher.PublishAsync(
+                withdrawalEvent,
                 cancellationToken);
 
             return new WithdrawWalletResponse(
