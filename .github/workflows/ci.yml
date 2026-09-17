@@ -22,11 +22,17 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Show repository structure
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 2 -type f | sort
+
       - name: Restore dependencies
-        run: dotnet restore Wallet.Api.sln
+        run: dotnet restore
 
       - name: Build solution
-        run: dotnet build Wallet.Api.sln --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release
 
       - name: Run unit tests
         run: dotnet test Wallet.UnitTests/Wallet.UnitTests.csproj --no-build --configuration Release
