@@ -6,10 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using Wallet.Application.Events;
+using Wallet.Application.Features.WalletAccounts.GetTransactions;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
+using Wallet.Domain.Entities;
 using Wallet.Domain.Enums;
 using Wallet.Infrastructure.Persistence;
-using Wallet.Domain.Entities;
 
 namespace Wallet.IntegrationTests
 {
@@ -300,6 +301,66 @@ namespace Wallet.IntegrationTests
             Assert.Equal(
                 idempotencyKey,
                 idempotencyRecord.IdempotencyKey);
+        }
+
+        [Fact]
+        public async Task GetTransactions_WithExistingWallet_ReturnsTransactions()
+        {
+            await using var factory = new WalletApiFactory();
+
+            var walletId = await CreateTestWalletAsync(
+                factory,
+                1000.00m);
+
+            var client = factory.CreateClient();
+
+            using var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"/api/wallet-accounts/{walletId}/withdraw");
+
+            request.Headers.Add(
+                "Idempotency-Key",
+                $"integration-{Guid.NewGuid()}");
+
+            request.Content = JsonContent.Create(
+                new
+                {
+                    amount = 100.00m
+                });
+
+            var withdrawalResponse =
+                await client.SendAsync(request);
+
+            Assert.Equal(
+                HttpStatusCode.OK,
+                withdrawalResponse.StatusCode);
+
+            var response = await client.GetAsync(
+                $"/api/wallet-accounts/{walletId}/transactions");
+
+            Assert.Equal(
+                HttpStatusCode.OK,
+                response.StatusCode);
+
+            var transactions =
+                await response.Content
+                    .ReadFromJsonAsync<
+                        List<WalletTransactionResponse>>();
+
+            Assert.NotNull(transactions);
+            Assert.Single(transactions);
+
+            Assert.Equal(
+                100.00m,
+                transactions[0].Amount);
+
+            Assert.Equal(
+                900.00m,
+                transactions[0].BalanceAfter);
+
+            Assert.Equal(
+                WalletTransactionType.Withdrawal,
+                transactions[0].Type);
         }
 
         private sealed record WithdrawResponse(

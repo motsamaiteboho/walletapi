@@ -12,5 +12,9 @@ namespace Wallet.Application.Abstractions
         Task AddAsync(
             WalletTransaction transaction,
             CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<WalletTransaction>> GetByWalletAccountIdAsync(
+            Guid walletAccountId,
+            CancellationToken cancellationToken = default);
     }
 }

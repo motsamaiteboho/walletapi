@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Wallet.Application.Abstractions;
+using Wallet.Application.Features.WalletAccounts.GetTransactions;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
 
 namespace Wallet.Api.Controllers
@@ -11,13 +12,15 @@ namespace Wallet.Api.Controllers
     {
         private readonly GetWalletBalanceService _balanceService;
         private readonly WithdrawWalletService _withdrawService;
-
+        private readonly GetWalletTransactionsService _transactionsService;
         public WalletAccountsController(
             GetWalletBalanceService balanceService,
-            WithdrawWalletService withdrawService)
+            WithdrawWalletService withdrawService,
+            GetWalletTransactionsService transactionsService)
         {
             _balanceService = balanceService;
             _withdrawService = withdrawService;
+            _transactionsService = transactionsService;
         }
 
         [HttpGet("{walletAccountId:guid}/balance")]
@@ -57,6 +60,17 @@ namespace Wallet.Api.Controllers
             {
                 return NotFound();
             }
+
+            return Ok(result);
+        }
+
+        [HttpGet("{walletAccountId:guid}/transactions")]
+        public async Task<IActionResult> GetTransactions(Guid walletAccountId, CancellationToken cancellationToken)
+        {
+            var result =
+                await _transactionsService.ExecuteAsync(
+                    walletAccountId,
+                    cancellationToken);
 
             return Ok(result);
         }
