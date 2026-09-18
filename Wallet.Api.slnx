@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/servicebus/">
+    <File Path="config.json" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="docker-compose.yml" />
   </Folder>
@@ -10,4 +13,5 @@
   <Project Path="Wallet.Application/Wallet.Application.csproj" />
   <Project Path="Wallet.Domain/Wallet.Domain.csproj" />
   <Project Path="Wallet.Infrastructure/Wallet.Infrastructure.csproj" />
+  <Project Path="Wallet.Worker/Wallet.Worker.csproj" Id="01064fa5-2213-49e6-a46d-6b2d777e31d1" />
 </Solution>
