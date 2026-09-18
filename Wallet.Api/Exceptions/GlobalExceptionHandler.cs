@@ -29,11 +29,14 @@ namespace Wallet.Api.Exceptions
                 InsufficientFundsException =>
                     StatusCodes.Status422UnprocessableEntity,
 
-                ArgumentException =>
-                    StatusCodes.Status400BadRequest,
-
                 WalletConcurrencyException =>
                     StatusCodes.Status409Conflict,
+
+                IdempotencyKeyConflictException =>
+                    StatusCodes.Status409Conflict,
+
+                ArgumentException =>
+                    StatusCodes.Status400BadRequest,
 
                 _ =>
                     StatusCodes.Status500InternalServerError
@@ -48,7 +51,7 @@ namespace Wallet.Api.Exceptions
                         "Invalid request.",
 
                     StatusCodes.Status409Conflict =>
-                        "Wallet was modified concurrently.",
+                        "Request conflicts with an existing operation.",
 
                     StatusCodes.Status422UnprocessableEntity =>
                         "Withdrawal could not be completed.",

@@ -25,6 +25,9 @@ namespace Wallet.Infrastructure.Persistence
         public DbSet<OutboxMessage> OutboxMessages =>
             Set<OutboxMessage>();
 
+        public DbSet<IdempotencyRecordEntity> IdempotencyRecords =>
+            Set<IdempotencyRecordEntity>();
+
         protected override void OnModelCreating(
             ModelBuilder modelBuilder)
         {

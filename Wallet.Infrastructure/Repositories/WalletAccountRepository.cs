@@ -39,18 +39,5 @@ namespace Wallet.Infrastructure.Repositories
                 walletAccount,
                 cancellationToken);
         }
-
-        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                await _context.SaveChangesAsync(
-                    cancellationToken);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw new WalletConcurrencyException();
-            }
-        }
     }
 }

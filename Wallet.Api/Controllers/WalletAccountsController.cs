@@ -38,14 +38,19 @@ namespace Wallet.Api.Controllers
         }
 
         [HttpPost("{walletAccountId:guid}/withdraw")]
-        public async Task<IActionResult> Withdraw(
-            Guid walletAccountId,
-            [FromBody] WithdrawWalletRequest request,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> Withdraw(Guid walletAccountId, [FromBody] WithdrawWalletRequest request,
+            [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey,CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(idempotencyKey))
+            {
+                return BadRequest(
+                    "Idempotency-Key header is required.");
+            }
+
             var result = await _withdrawService.ExecuteAsync(
                 walletAccountId,
                 request,
+                idempotencyKey,
                 cancellationToken);
 
             if (result is null)

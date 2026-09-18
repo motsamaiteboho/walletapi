@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
 using Wallet.Infrastructure.Events;
 using Wallet.Infrastructure.Persistence;
+using Wallet.Infrastructure.Persistence.Idempotency;
 using Wallet.Infrastructure.Persistence.Outbox;
 using Wallet.Infrastructure.Repositories;
 
@@ -36,6 +37,8 @@ namespace Wallet.Infrastructure
             services.AddScoped<IUnitOfWork, WalletUnitOfWork>();
 
             services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
+
+            services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 
             return services;
         }

@@ -9,6 +9,7 @@ using Wallet.Application.Events;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
 using Wallet.Domain.Entities;
 using Wallet.Domain.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
 {
@@ -36,18 +37,29 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
 
             var eventPublisher = new Mock<IEventPublisher>();
             var unitOfWork = new Mock<IUnitOfWork>();
+            var logger = new Mock<ILogger<WithdrawWalletService>>();
+            var idempotencyRepository = new Mock<IIdempotencyRepository>();
+            idempotencyRepository
+                .Setup(x => x.GetAsync(
+                    WalletId,
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IdempotencyRecord?)null);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
-                unitOfWork.Object);
+                unitOfWork.Object,
+                idempotencyRepository.Object,
+                logger.Object);
 
             var request = new WithdrawWalletRequest(250.00m);
 
             // Act
             var result = await service.ExecuteAsync(
                 WalletId,
-                request);
+                request,
+                "idem-1");
 
             // Assert
             Assert.NotNull(result);
@@ -87,18 +99,29 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
 
             var eventPublisher = new Mock<IEventPublisher>();
             var unitOfWork = new Mock<IUnitOfWork>();
+            var logger = new Mock<ILogger<WithdrawWalletService>>();
+            var idempotencyRepository = new Mock<IIdempotencyRepository>();
+            idempotencyRepository
+                .Setup(x => x.GetAsync(
+                    WalletId,
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IdempotencyRecord?)null);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
-                unitOfWork.Object);
+                unitOfWork.Object,
+                idempotencyRepository.Object,
+                logger.Object);
 
             var request = new WithdrawWalletRequest(300.00m);
 
             // Act
-            await service.ExecuteAsync(
+            var result = await service.ExecuteAsync(
                 WalletId,
-                request);
+                request,
+                "idem-1");
 
             // Assert
             eventPublisher.Verify(
@@ -131,11 +154,21 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
 
             var eventPublisher = new Mock<IEventPublisher>();
             var unitOfWork = new Mock<IUnitOfWork>();
+            var logger = new Mock<ILogger<WithdrawWalletService>>();
+            var idempotencyRepository = new Mock<IIdempotencyRepository>();
+            idempotencyRepository
+                .Setup(x => x.GetAsync(
+                    WalletId,
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IdempotencyRecord?)null);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
-                unitOfWork.Object);
+                unitOfWork.Object,
+                idempotencyRepository.Object,
+                logger.Object);
 
             var request = new WithdrawWalletRequest(1500.00m);
 
@@ -143,7 +176,8 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             await Assert.ThrowsAsync<InsufficientFundsException>(
                 () => service.ExecuteAsync(
                     WalletId,
-                    request));
+                    request,
+                    "idem-3"));
 
             // Assert
             Assert.Equal(1000.00m, wallet.Balance);
@@ -174,18 +208,29 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
 
             var eventPublisher = new Mock<IEventPublisher>();
             var unitOfWork = new Mock<IUnitOfWork>();
+            var logger = new Mock<ILogger<WithdrawWalletService>>();
+            var idempotencyRepository = new Mock<IIdempotencyRepository>();
+            idempotencyRepository
+                .Setup(x => x.GetAsync(
+                    WalletId,
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IdempotencyRecord?)null);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
-                unitOfWork.Object);
+                unitOfWork.Object,
+                idempotencyRepository.Object,
+                logger.Object);
 
             var request = new WithdrawWalletRequest(250.00m);
 
             // Act
             var result = await service.ExecuteAsync(
                 WalletId,
-                request);
+                request,
+                "idem-2");
 
             // Assert
             Assert.Null(result);
