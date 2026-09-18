@@ -28,6 +28,9 @@ namespace Wallet.Infrastructure.Persistence
         public DbSet<IdempotencyRecordEntity> IdempotencyRecords =>
             Set<IdempotencyRecordEntity>();
 
+        public DbSet<WalletTransaction> WalletTransactions =>
+            Set<WalletTransaction>();
+
         protected override void OnModelCreating(
             ModelBuilder modelBuilder)
         {

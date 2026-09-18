@@ -40,6 +40,8 @@ namespace Wallet.Infrastructure
 
             services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 
+            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+
             return services;
         }
     }

@@ -10,6 +10,7 @@ using Wallet.Application.Events;
 using Wallet.Application.Exceptions;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
 using Wallet.Domain.Entities;
+using Wallet.Domain.Enums;
 using Wallet.Domain.Exceptions;
 
 namespace Wallet.UnitTests.Features.WalletAccounts.Withdraw
@@ -31,6 +32,9 @@ namespace Wallet.UnitTests.Features.WalletAccounts.Withdraw
         private readonly Mock<ILogger<WithdrawWalletService>>
             _logger;
 
+        private readonly Mock<IWalletTransactionRepository>
+            _transactionRepository;
+
         private readonly WithdrawWalletService _service;
 
         public WithdrawWalletServiceTests()
@@ -40,12 +44,19 @@ namespace Wallet.UnitTests.Features.WalletAccounts.Withdraw
             _unitOfWork = new Mock<IUnitOfWork>();
             _idempotencyRepository = new Mock<IIdempotencyRepository>();
             _logger = new Mock<ILogger<WithdrawWalletService>>();
+            _transactionRepository = new Mock<IWalletTransactionRepository>();
+            _transactionRepository
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Wallet.Domain.Entities.WalletTransaction>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             _service = new WithdrawWalletService(
                 _walletRepository.Object,
                 _eventPublisher.Object,
                 _unitOfWork.Object,
                 _idempotencyRepository.Object,
+                _transactionRepository.Object,
                 _logger.Object);
         }
 
@@ -355,6 +366,52 @@ namespace Wallet.UnitTests.Features.WalletAccounts.Withdraw
                 Times.Once);
         }
 
+        [Fact]
+        public async Task Withdraw_Successfully_PublishesWithdrawalEvent()
+        {
+            // Arrange
+            var walletId =
+                Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+            var wallet = new WalletAccount(
+                walletId,
+                1000.00m,
+                "ZAR");
+
+            var request =
+                new WithdrawWalletRequest(250.00m);
+
+            _walletRepository
+                .Setup(x => x.GetByIdAsync(
+                    walletId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(wallet);
+
+            _idempotencyRepository
+                .Setup(x => x.GetAsync(
+                    walletId,
+                    "withdrawal-event-001",
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IdempotencyRecord?)null);
+
+            // Act
+            await _service.ExecuteAsync(
+                walletId,
+                request,
+                "withdrawal-event-001");
+
+            // Assert
+            _eventPublisher.Verify(
+                x => x.PublishAsync(
+                    It.Is<WalletWithdrawalEvent>(eventData =>
+                        eventData.WalletAccountId == walletId &&
+                        eventData.Amount == 250.00m &&
+                        eventData.RemainingBalance == 750.00m &&
+                        eventData.Currency == "ZAR"),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
         private static string CreateRequestHash( decimal amount)
         {
             var normalizedAmount =
@@ -368,6 +425,53 @@ namespace Wallet.UnitTests.Features.WalletAccounts.Withdraw
                         normalizedAmount));
 
             return Convert.ToHexString(bytes);
+        }
+
+        [Fact]
+        public async Task Withdraw_Successfully_CreatesWalletTransaction()
+        {
+            // Arrange
+            var walletId =
+                Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+            var wallet = new WalletAccount(
+                walletId,
+                1000.00m,
+                "ZAR");
+
+            var request =
+                new WithdrawWalletRequest(250.00m);
+
+            _walletRepository
+                .Setup(x => x.GetByIdAsync(
+                    walletId,
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(wallet);
+
+            _idempotencyRepository
+                .Setup(x => x.GetAsync(
+                    walletId,
+                    "transaction-test-001",
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((IdempotencyRecord?)null);
+
+            // Act
+            await _service.ExecuteAsync(
+                walletId,
+                request,
+                "transaction-test-001");
+
+            // Assert
+            _transactionRepository.Verify(
+                x => x.AddAsync(
+                    It.Is<WalletTransaction>(transaction =>
+                        transaction.WalletAccountId == walletId &&
+                        transaction.Type ==
+                            WalletTransactionType.Withdrawal &&
+                        transaction.Amount == 250.00m &&
+                        transaction.BalanceAfter == 750.00m),
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
         }
 
     }

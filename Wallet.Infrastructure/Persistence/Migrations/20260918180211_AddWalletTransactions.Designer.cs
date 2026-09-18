@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Wallet.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace Wallet.Infrastructure.Migrations
+namespace Wallet.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260918180211_AddWalletTransactions")]
+    partial class AddWalletTransactions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,15 +161,6 @@ namespace Wallet.Infrastructure.Migrations
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("outbox_messages", (string)null);
-                });
-
-            modelBuilder.Entity("Wallet.Domain.Entities.WalletTransaction", b =>
-                {
-                    b.HasOne("Wallet.Domain.Entities.WalletAccount", null)
-                        .WithMany()
-                        .HasForeignKey("WalletAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

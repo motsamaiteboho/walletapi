@@ -45,12 +45,19 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IdempotencyRecord?)null);
+            var transactionRepository = new Mock<IWalletTransactionRepository>();
+            transactionRepository
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Wallet.Domain.Entities.WalletTransaction>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
                 unitOfWork.Object,
                 idempotencyRepository.Object,
+                transactionRepository.Object,
                 logger.Object);
 
             var request = new WithdrawWalletRequest(250.00m);
@@ -107,12 +114,19 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IdempotencyRecord?)null);
+            var transactionRepository = new Mock<IWalletTransactionRepository>();
+            transactionRepository
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Wallet.Domain.Entities.WalletTransaction>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
                 unitOfWork.Object,
                 idempotencyRepository.Object,
+                transactionRepository.Object,
                 logger.Object);
 
             var request = new WithdrawWalletRequest(300.00m);
@@ -162,12 +176,19 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IdempotencyRecord?)null);
+            var transactionRepository = new Mock<IWalletTransactionRepository>();
+            transactionRepository
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Wallet.Domain.Entities.WalletTransaction>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
                 unitOfWork.Object,
                 idempotencyRepository.Object,
+                transactionRepository.Object,
                 logger.Object);
 
             var request = new WithdrawWalletRequest(1500.00m);
@@ -216,12 +237,19 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync((IdempotencyRecord?)null);
+            var transactionRepository = new Mock<IWalletTransactionRepository>();
+            transactionRepository
+                .Setup(x => x.AddAsync(
+                    It.IsAny<Wallet.Domain.Entities.WalletTransaction>(),
+                    It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
 
             var service = new WithdrawWalletService(
                 repository.Object,
                 eventPublisher.Object,
                 unitOfWork.Object,
                 idempotencyRepository.Object,
+                transactionRepository.Object,
                 logger.Object);
 
             var request = new WithdrawWalletRequest(250.00m);

@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
 using Wallet.Application.Events;
 using Wallet.Application.Exceptions;
+using Wallet.Domain.Entities;
+using Wallet.Domain.Enums;
 
 namespace Wallet.Application.Features.WalletAccounts.Withdraw
 {
@@ -21,26 +23,28 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<WithdrawWalletService> _logger;
         private readonly IIdempotencyRepository _idempotencyRepository;
-
+        private readonly IWalletTransactionRepository _transactionRepository;
         public WithdrawWalletService(
             IWalletAccountRepository repository,
             IEventPublisher eventPublisher,
             IUnitOfWork unitOfWork,
             IIdempotencyRepository idempotencyRepository,
+            IWalletTransactionRepository transactionRepository,
             ILogger<WithdrawWalletService> logger)
         {
             _repository = repository;
             _eventPublisher = eventPublisher;
             _unitOfWork = unitOfWork;
             _idempotencyRepository = idempotencyRepository;
+            _transactionRepository = transactionRepository;
             _logger = logger;
         }
 
-        public async Task<WithdrawWalletResponse?> ExecuteAsync(
-     Guid walletAccountId,
-     WithdrawWalletRequest request,
-     string idempotencyKey,
-     CancellationToken cancellationToken = default)
+    public async Task<WithdrawWalletResponse?> ExecuteAsync(
+        Guid walletAccountId,
+        WithdrawWalletRequest request,
+        string idempotencyKey,
+        CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(idempotencyKey))
             {
@@ -96,6 +100,22 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                 walletAccount.Currency);
 
             walletAccount.Withdraw(request.Amount);
+
+            _logger.LogInformation( "Wallet withdrawal applied. WalletAccountId={WalletAccountId}, Amount={Amount}, RemainingBalance={RemainingBalance}",
+                walletAccount.Id,
+                request.Amount,
+                walletAccount.Balance);
+
+            var transaction = new WalletTransaction(
+                Guid.NewGuid(),
+                walletAccount.Id,
+                WalletTransactionType.Withdrawal,
+                request.Amount,
+                walletAccount.Balance);
+
+            await _transactionRepository.AddAsync(
+                transaction,
+                cancellationToken);
 
             var withdrawalEvent = new WalletWithdrawalEvent(
                 walletAccount.Id,
