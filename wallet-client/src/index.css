@@ -4,10 +4,113 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
     background: #f4f6f8;
+    color: #1f2937;
 }
 
 #root {
     min-height: 100vh;
+}
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
+
+.wallet-card {
+    width: 100%;
+    max-width: 460px;
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.wallet-header {
+    margin-bottom: 32px;
+}
+
+.wallet-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.wallet-header p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.balance-section {
+    margin-bottom: 32px;
+}
+
+.balance-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.balance {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.withdraw-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.withdraw-form label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.withdraw-form input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+}
+
+.withdraw-form input:focus {
+    border-color: #6b7280;
+}
+
+.withdraw-form button {
+    margin-top: 8px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.loading {
+    color: #6b7280;
+    font-size: 18px;
+}
+
+.error {
+    padding: 12px;
+    border-radius: 8px;
+    background: #ffebee;
+    color: #b91c1c;
+    font-size: 14px;
 }
