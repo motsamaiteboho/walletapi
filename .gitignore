@@ -43,3 +43,9 @@ coverage/
 
 # Generated EF files
 # Keep migrations tracked — do NOT ignore them.
+
+# React / Node
+wallet-client/node_modules/
+wallet-client/dist/
+wallet-client/.env.local
+wallet-client/.env.*.local
