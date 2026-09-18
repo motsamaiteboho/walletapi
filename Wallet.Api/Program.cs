@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Wallet.Api.Exceptions;
+using Wallet.Api.Middleware;
 using Wallet.Application;
 using Wallet.Application.Abstractions;
 using Wallet.Infrastructure;
@@ -24,6 +25,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseExceptionHandler();
 

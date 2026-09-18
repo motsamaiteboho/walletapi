@@ -13,9 +13,6 @@ namespace Wallet.Infrastructure.Events
             T @event,
             CancellationToken cancellationToken = default)
         {
-            Console.WriteLine(
-                $"Event published: {typeof(T).Name}");
-
             return Task.CompletedTask;
         }
     }

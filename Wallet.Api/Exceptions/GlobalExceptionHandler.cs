@@ -20,9 +20,9 @@ namespace Wallet.Api.Exceptions
             Exception exception,
             CancellationToken cancellationToken)
         {
-            _logger.LogError(
-                exception,
-                "An unhandled exception occurred.");
+            _logger.LogError(exception, "Unhandled exception processing request. Method={Method}, Path={Path}",
+                httpContext.Request.Method,
+                httpContext.Request.Path);
 
             var statusCode = exception switch
             {
