@@ -20,6 +20,8 @@ namespace Wallet.Infrastructure.Persistence.Outbox
 
         public int RetryCount { get; private set; }
 
+        public DateTime? NextRetryAt { get; private set; }
+
         public string? Error { get; private set; }
 
         private OutboxMessage()
@@ -44,12 +46,16 @@ namespace Wallet.Infrastructure.Persistence.Outbox
         {
             ProcessedAt = DateTime.UtcNow;
             Error = null;
+            NextRetryAt = null;
         }
 
-        public void MarkAsFailed(string error)
+        public void MarkAsFailed(
+            string error,
+            TimeSpan retryDelay)
         {
             RetryCount++;
             Error = error;
+            NextRetryAt = DateTime.UtcNow.Add(retryDelay);
         }
     }
 }

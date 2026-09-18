@@ -37,6 +37,10 @@ namespace Wallet.Infrastructure.Persistence.Configurations
             builder.Property(message => message.Error);
 
             builder.HasIndex(message => message.ProcessedAt);
+
+            builder.Property(message => message.NextRetryAt);
+
+            builder.HasIndex(message => message.NextRetryAt);
         }
     }
 }
