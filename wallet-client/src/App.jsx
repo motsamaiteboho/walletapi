@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import {
     getBalance,
-    withdraw
+    withdraw,
+    getTransactions
 } from "./api/walletApi";
 import "./index.css";
 
 function App() {
     const [balance, setBalance] = useState(null);
     const [currency, setCurrency] = useState("");
+    const [transactions, setTransactions] = useState([]);
 
     const [amount, setAmount] = useState("");
 
@@ -19,29 +21,35 @@ function App() {
     const [message, setMessage] = useState("");
 
     /*
-     * Load the current wallet balance from the API.
+     * Load the wallet balance and transaction history.
      *
-     * useCallback allows the same function to be used by:
-     * - the initial page load
-     * - the Refresh Balance button
+     * This function is shared by:
+     * - Initial page load
+     * - Refresh Balance button
      */
     const loadWallet = useCallback(async () => {
         try {
             setError("");
 
-            const data = await getBalance();
+            const [balanceData, transactionData] =
+                await Promise.all([
+                    getBalance(),
+                    getTransactions()
+                ]);
 
-            setBalance(data.balance);
-            setCurrency(data.currency);
+            setBalance(balanceData.balance);
+            setCurrency(balanceData.currency);
+            setTransactions(transactionData);
         } catch (err) {
             setError(
-                err.message || "Unable to load wallet balance."
+                err.message ||
+                "Unable to load wallet information."
             );
         }
     }, []);
 
     /*
-     * Load wallet when the application starts.
+     * Load wallet information when the application starts.
      */
     useEffect(() => {
         async function initialiseWallet() {
@@ -57,7 +65,7 @@ function App() {
     }, [loadWallet]);
 
     /*
-     * Refresh the wallet balance from the backend.
+     * Refresh the wallet balance and transaction history.
      */
     async function handleRefresh() {
         try {
@@ -93,8 +101,8 @@ function App() {
         }
 
         /*
-         * Generate a unique idempotency key for this
-         * withdrawal operation.
+         * Generate a unique idempotency key for
+         * this withdrawal operation.
          */
         const idempotencyKey = crypto.randomUUID();
 
@@ -107,11 +115,20 @@ function App() {
             );
 
             /*
-             * Update the UI using the authoritative response
-             * returned by the backend.
+             * Update the balance using the authoritative
+             * response returned by the backend.
              */
             setBalance(data.remainingBalance);
             setCurrency(data.currency);
+
+            /*
+             * Reload transaction history so the newly
+             * created transaction appears immediately.
+             */
+            const updatedTransactions =
+                await getTransactions();
+
+            setTransactions(updatedTransactions);
 
             setMessage(
                 `Withdrawal successful. ${data.currency} ${Number(
@@ -120,12 +137,13 @@ function App() {
             );
 
             /*
-             * Clear the input after a successful withdrawal.
+             * Clear the withdrawal input.
              */
             setAmount("");
         } catch (err) {
             setError(
-                err.message || "Unable to process withdrawal."
+                err.message ||
+                "Unable to process withdrawal."
             );
         } finally {
             setWithdrawing(false);
@@ -150,11 +168,12 @@ function App() {
 
                     {loading ? (
                         <div className="loading">
-                            Loading balance...
+                            Loading wallet...
                         </div>
                     ) : balance === null ? (
                         <div className="error">
-                            {error || "Unable to load balance."}
+                            {error ||
+                                "Unable to load wallet balance."}
                         </div>
                     ) : (
                         <div className="balance">
@@ -169,7 +188,10 @@ function App() {
                             type="button"
                             className="refresh-button"
                             onClick={handleRefresh}
-                            disabled={refreshing || withdrawing}
+                            disabled={
+                                refreshing ||
+                                withdrawing
+                            }
                         >
                             {refreshing
                                 ? "Refreshing..."
@@ -231,6 +253,65 @@ function App() {
                         {error}
                     </div>
                 )}
+
+                {/* Transaction History */}
+                <section className="transactions-section">
+                    <div className="section-header">
+                        <h2>Transaction History</h2>
+                    </div>
+
+                    {loading ? (
+                        <p className="empty-state">
+                            Loading transactions...
+                        </p>
+                    ) : transactions.length === 0 ? (
+                        <p className="empty-state">
+                            No transactions yet.
+                        </p>
+                    ) : (
+                        <div className="transactions-list">
+                            {transactions.map(
+                                (transaction) => (
+                                    <div
+                                        className="transaction-item"
+                                        key={
+                                            transaction.transactionId
+                                        }
+                                    >
+                                        <div>
+                                            <strong>
+                                                {
+                                                    transaction.type
+                                                }
+                                            </strong>
+
+                                            <span className="transaction-date">
+                                                {new Date(
+                                                    transaction.createdAt
+                                                ).toLocaleString()}
+                                            </span>
+                                        </div>
+
+                                        <div className="transaction-amount">
+                                            -{currency}{" "}
+                                            {Number(
+                                                transaction.amount
+                                            ).toFixed(2)}
+
+                                            <span>
+                                                Balance:{" "}
+                                                {currency}{" "}
+                                                {Number(
+                                                    transaction.balanceAfter
+                                                ).toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                    )}
+                </section>
 
             </section>
         </main>

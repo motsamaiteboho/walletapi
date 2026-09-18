@@ -46,3 +46,11 @@ export async function withdraw(
 
     return handleResponse(response);
 }
+
+export async function getTransactions() {
+    const response = await fetch(
+        `${API_BASE_URL}/api/wallet-accounts/${WALLET_ID}/transactions`
+    );
+
+    return handleResponse(response);
+}
