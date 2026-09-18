@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Wallet.Application.Events;
+using Wallet.Application.Features.WalletAccounts.Withdraw;
+using Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw;
 
 namespace Wallet.Worker.Messaging
 {
@@ -13,15 +15,17 @@ namespace Wallet.Worker.Messaging
     public class ServiceBusMessageConsumer
     {
         private const string QueueName = "wallet-withdrawals";
-
         private readonly ServiceBusClient _client;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<ServiceBusMessageConsumer> _logger;
 
         public ServiceBusMessageConsumer(
             ServiceBusClient client,
+            IServiceScopeFactory scopeFactory,
             ILogger<ServiceBusMessageConsumer> logger)
         {
             _client = client;
+            _scopeFactory = scopeFactory;
             _logger = logger;
         }
 
@@ -65,8 +69,7 @@ namespace Wallet.Worker.Messaging
                 CancellationToken.None);
         }
 
-        private async Task ProcessMessageAsync(
-            ProcessMessageEventArgs args)
+        private async Task ProcessMessageAsync( ProcessMessageEventArgs args)
         {
             var body = args.Message.Body.ToString();
 
@@ -80,16 +83,20 @@ namespace Wallet.Worker.Messaging
                     "Unable to deserialize WalletWithdrawalEvent.");
             }
 
-            _logger.LogInformation("Withdrawal event received. " +
-                    "WalletAccountId={WalletAccountId}, " +
-                    "Amount={Amount}, " +
-                    "RemainingBalance={RemainingBalance}",
-                    withdrawalEvent.WalletAccountId,
-                    withdrawalEvent.Amount,
-                    withdrawalEvent.RemainingBalance);
+            using var scope = _scopeFactory.CreateScope();
 
-            await args.CompleteMessageAsync(
-                args.Message);
+            var processor =scope.ServiceProvider
+                .GetRequiredService<ProcessWithdrawalEventService>();
+
+            _logger.LogInformation("Withdrawal event received. MessageId={MessageId}, WalletAccountId={WalletAccountId}",
+                    args.Message.MessageId,
+                    withdrawalEvent.WalletAccountId);
+
+            await processor.ProcessAsync(
+                    withdrawalEvent,
+                    args.CancellationToken);
+
+            await args.CompleteMessageAsync(args.Message);
         }
 
         private Task ProcessErrorAsync(

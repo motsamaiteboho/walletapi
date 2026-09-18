@@ -18,6 +18,8 @@ namespace Wallet.Application
             services.AddScoped<GetWalletBalanceService>();
             services.AddScoped<WithdrawWalletService>();
             services.AddScoped<GetWalletTransactionsService>();
+            services.AddScoped<IWithdrawalProcessor, LocalWithdrawalProcessor>();
+            services.AddScoped<ProcessWithdrawalEventService>();
             return services;
         }
     }

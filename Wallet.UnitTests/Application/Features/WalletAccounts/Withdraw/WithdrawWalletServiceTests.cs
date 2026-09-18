@@ -274,5 +274,54 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                     It.IsAny<CancellationToken>()),
                 Times.Never);
         }
+
+        [Fact]
+        public async Task ProcessAsync_CallsWithdrawalProcessor()
+        {
+            var processor = new Mock<IWithdrawalProcessor>();
+
+            var service = new ProcessWithdrawalEventService(
+                processor.Object);
+
+            var withdrawalEvent = new WalletWithdrawalEvent(
+                Guid.NewGuid(),
+                100,
+                900,
+                "ZAR",
+                DateTime.UtcNow);
+
+            await service.ProcessAsync(withdrawalEvent);
+
+            processor.Verify(
+                x => x.ProcessAsync(
+                    withdrawalEvent,
+                    It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessAsync_PropagatesProcessorFailure()
+        {
+            var processor = new Mock<IWithdrawalProcessor>();
+
+            processor
+                .Setup(x => x.ProcessAsync(
+                    It.IsAny<WalletWithdrawalEvent>(),
+                    It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Payment failed."));
+
+            var service = new ProcessWithdrawalEventService(
+                processor.Object);
+
+            var withdrawalEvent = new WalletWithdrawalEvent(
+                Guid.NewGuid(),
+                100,
+                900,
+                "ZAR",
+                DateTime.UtcNow);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => service.ProcessAsync(withdrawalEvent));
+        }
     }
 }
