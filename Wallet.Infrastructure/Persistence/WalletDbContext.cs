@@ -31,6 +31,12 @@ namespace Wallet.Infrastructure.Persistence
         public DbSet<WalletTransaction> WalletTransactions =>
             Set<WalletTransaction>();
 
+        public DbSet<PaymentProcessingRecord> PaymentProcessingRecords
+        {
+            get;
+            set;
+        }
+
         protected override void OnModelCreating(
             ModelBuilder modelBuilder)
         {

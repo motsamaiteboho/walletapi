@@ -10,25 +10,24 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw.Payment
 {
     public class LocalPaymentProcessor : IPaymentProcessor
     {
+        private readonly IPaymentProcessingRepository _repository;
         private readonly ILogger<LocalPaymentProcessor> _logger;
 
         public LocalPaymentProcessor(
+            IPaymentProcessingRepository repository,
             ILogger<LocalPaymentProcessor> logger)
         {
+            _repository = repository;
             _logger = logger;
         }
 
-        public Task ProcessAsync(
-            WalletWithdrawalEvent withdrawalEvent,
+        public async Task ProcessAsync(  WalletWithdrawalEvent withdrawalEvent,
             CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation(
-                "Payment processed successfully. WalletAccountId={WalletAccountId}, Amount={Amount}, Currency={Currency}",
-                withdrawalEvent.WalletAccountId,
-                withdrawalEvent.Amount,
-                withdrawalEvent.Currency);
-
-            return Task.CompletedTask;
+            var existingRecord =
+                await _repository.GetByEventIdAsync(
+                    withdrawalEvent.WalletAccountId,
+                    cancellationToken);
         }
     }
 }

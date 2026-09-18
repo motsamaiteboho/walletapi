@@ -7,10 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
+using Wallet.Application.Features.WalletAccounts.Withdraw.Payment;
 using Wallet.Infrastructure.Events;
 using Wallet.Infrastructure.Persistence;
 using Wallet.Infrastructure.Persistence.Idempotency;
 using Wallet.Infrastructure.Persistence.Outbox;
+using Wallet.Infrastructure.Persistence.Payment;
 using Wallet.Infrastructure.Repositories;
 
 namespace Wallet.Infrastructure
@@ -41,6 +43,8 @@ namespace Wallet.Infrastructure
             services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 
             services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+
+            services.AddScoped<IPaymentProcessingRepository, PaymentProcessingRepository>();
 
             return services;
         }
