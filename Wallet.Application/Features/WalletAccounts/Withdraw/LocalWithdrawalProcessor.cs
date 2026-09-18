@@ -5,30 +5,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Application.Events;
+using Wallet.Application.Features.WalletAccounts.Withdraw.Payment;
 
 namespace Wallet.Application.Features.WalletAccounts.Withdraw
 {
     public class LocalWithdrawalProcessor : IWithdrawalProcessor
     {
-        private readonly ILogger<LocalWithdrawalProcessor> _logger;
+        private readonly IPaymentProcessor _paymentProcessor;
 
         public LocalWithdrawalProcessor(
-            ILogger<LocalWithdrawalProcessor> logger)
+            IPaymentProcessor paymentProcessor)
         {
-            _logger = logger;
+            _paymentProcessor = paymentProcessor;
         }
 
         public Task ProcessAsync(
             WalletWithdrawalEvent withdrawalEvent,
             CancellationToken cancellationToken = default)
         {
-            _logger.LogInformation(
-                "Processing withdrawal downstream. WalletAccountId={WalletAccountId}, Amount={Amount}, Currency={Currency}",
-                withdrawalEvent.WalletAccountId,
-                withdrawalEvent.Amount,
-                withdrawalEvent.Currency);
-
-            return Task.CompletedTask;
+            return _paymentProcessor.ProcessAsync(
+                withdrawalEvent,
+                cancellationToken);
         }
     }
 }

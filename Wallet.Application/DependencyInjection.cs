@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Wallet.Application.Abstractions;
 using Wallet.Application.Features.WalletAccounts.GetTransactions;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
+using Wallet.Application.Features.WalletAccounts.Withdraw.Payment;
 
 namespace Wallet.Application
 {
@@ -19,6 +20,9 @@ namespace Wallet.Application
             services.AddScoped<WithdrawWalletService>();
             services.AddScoped<GetWalletTransactionsService>();
             services.AddScoped<IWithdrawalProcessor, LocalWithdrawalProcessor>();
+            services.AddScoped<ProcessWithdrawalEventService>();
+            services.AddScoped<IWithdrawalProcessor, LocalWithdrawalProcessor>();
+            services.AddScoped<IPaymentProcessor, LocalPaymentProcessor>();
             services.AddScoped<ProcessWithdrawalEventService>();
             return services;
         }

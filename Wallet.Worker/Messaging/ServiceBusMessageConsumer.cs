@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Wallet.Application.Events;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
-using Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw;
 
 namespace Wallet.Worker.Messaging
 {
