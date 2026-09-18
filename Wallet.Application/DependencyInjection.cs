@@ -24,6 +24,7 @@ namespace Wallet.Application
             services.AddScoped<IWithdrawalProcessor, LocalWithdrawalProcessor>();
             services.AddScoped<IPaymentProcessor, LocalPaymentProcessor>();
             services.AddScoped<ProcessWithdrawalEventService>();
+            services.AddScoped<WithdrawalEventHandler>();
             return services;
         }
     }

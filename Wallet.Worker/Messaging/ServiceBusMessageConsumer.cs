@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Wallet.Application.Events;
 using Wallet.Application.Features.WalletAccounts.Withdraw;
+using Wallet.Application.Features.WalletAccounts.Withdraw.Payment;
 
 namespace Wallet.Worker.Messaging
 {
@@ -72,9 +73,7 @@ namespace Wallet.Worker.Messaging
         {
             var body = args.Message.Body.ToString();
 
-            var withdrawalEvent =
-                JsonSerializer.Deserialize<WalletWithdrawalEvent>(
-                    body);
+            var withdrawalEvent = JsonSerializer.Deserialize<WalletWithdrawalEvent>(body);
 
             if (withdrawalEvent is null)
             {
@@ -84,18 +83,28 @@ namespace Wallet.Worker.Messaging
 
             using var scope = _scopeFactory.CreateScope();
 
-            var processor =scope.ServiceProvider
-                .GetRequiredService<ProcessWithdrawalEventService>();
+            var handler = scope.ServiceProvider
+                .GetRequiredService<WithdrawalEventHandler>();
 
-            _logger.LogInformation("Withdrawal event received. MessageId={MessageId}, WalletAccountId={WalletAccountId}",
-                    args.Message.MessageId,
-                    withdrawalEvent.WalletAccountId);
-
-            await processor.ProcessAsync(
+            try
+            {
+                await handler.HandleAsync(
                     withdrawalEvent,
                     args.CancellationToken);
 
-            await args.CompleteMessageAsync(args.Message);
+                await args.CompleteMessageAsync(args.Message);
+            }
+            catch (PaymentValidationException exception)
+            {
+                await args.DeadLetterMessageAsync(
+                    args.Message,
+                    "PaymentValidationFailure",
+                    exception.Message);
+            }
+            catch (PaymentProcessingException)
+            {
+                throw;
+            }
         }
 
         private Task ProcessErrorAsync(
