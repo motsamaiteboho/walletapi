@@ -17,7 +17,5 @@ namespace Wallet.Application.Abstractions
             WalletAccount walletAccount,
             CancellationToken cancellationToken = default);
 
-        Task SaveChangesAsync(
-            CancellationToken cancellationToken = default);
     }
 }

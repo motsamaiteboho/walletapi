@@ -35,10 +35,12 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                 .ReturnsAsync(wallet);
 
             var eventPublisher = new Mock<IEventPublisher>();
+            var unitOfWork = new Mock<IUnitOfWork>();
 
             var service = new WithdrawWalletService(
                 repository.Object,
-                eventPublisher.Object);
+                eventPublisher.Object,
+                unitOfWork.Object);
 
             var request = new WithdrawWalletRequest(250.00m);
 
@@ -54,7 +56,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             Assert.Equal(750.00m, result.RemainingBalance);
             Assert.Equal("ZAR", result.Currency);
 
-            repository.Verify(
+            unitOfWork.Verify(
                 x => x.SaveChangesAsync(
                     It.IsAny<CancellationToken>()),
                 Times.Once);
@@ -84,10 +86,12 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                 .ReturnsAsync(wallet);
 
             var eventPublisher = new Mock<IEventPublisher>();
+            var unitOfWork = new Mock<IUnitOfWork>();
 
             var service = new WithdrawWalletService(
                 repository.Object,
-                eventPublisher.Object);
+                eventPublisher.Object,
+                unitOfWork.Object);
 
             var request = new WithdrawWalletRequest(300.00m);
 
@@ -126,10 +130,12 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                 .ReturnsAsync(wallet);
 
             var eventPublisher = new Mock<IEventPublisher>();
+            var unitOfWork = new Mock<IUnitOfWork>();
 
             var service = new WithdrawWalletService(
                 repository.Object,
-                eventPublisher.Object);
+                eventPublisher.Object,
+                unitOfWork.Object);
 
             var request = new WithdrawWalletRequest(1500.00m);
 
@@ -142,7 +148,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             // Assert
             Assert.Equal(1000.00m, wallet.Balance);
 
-            repository.Verify(
+            unitOfWork.Verify(
                 x => x.SaveChangesAsync(
                     It.IsAny<CancellationToken>()),
                 Times.Never);
@@ -167,10 +173,12 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                 .ReturnsAsync((WalletAccount?)null);
 
             var eventPublisher = new Mock<IEventPublisher>();
+            var unitOfWork = new Mock<IUnitOfWork>();
 
             var service = new WithdrawWalletService(
                 repository.Object,
-                eventPublisher.Object);
+                eventPublisher.Object,
+                unitOfWork.Object);
 
             var request = new WithdrawWalletRequest(250.00m);
 
@@ -182,7 +190,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             // Assert
             Assert.Null(result);
 
-            repository.Verify(
+            unitOfWork.Verify(
                 x => x.SaveChangesAsync(
                     It.IsAny<CancellationToken>()),
                 Times.Never);

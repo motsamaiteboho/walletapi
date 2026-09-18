@@ -12,13 +12,15 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
     {
         private readonly IWalletAccountRepository _repository;
         private readonly IEventPublisher _eventPublisher;
-
+        private readonly IUnitOfWork _unitOfWork;
         public WithdrawWalletService(
             IWalletAccountRepository repository,
-            IEventPublisher eventPublisher)
+            IEventPublisher eventPublisher,
+            IUnitOfWork unitOfWork)
         {
             _repository = repository;
             _eventPublisher = eventPublisher;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<WithdrawWalletResponse?> ExecuteAsync(
@@ -38,7 +40,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
 
             walletAccount.Withdraw(request.Amount);
 
-            await _repository.SaveChangesAsync(
+            await _unitOfWork.SaveChangesAsync(
                 cancellationToken);
 
             var withdrawalEvent = new WalletWithdrawalEvent(

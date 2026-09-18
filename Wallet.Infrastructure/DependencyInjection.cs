@@ -32,6 +32,8 @@ namespace Wallet.Infrastructure
 
             services.AddScoped<IEventPublisher,InMemoryEventPublisher>();
 
+            services.AddScoped<IUnitOfWork, WalletUnitOfWork>();
+
             return services;
         }
     }
