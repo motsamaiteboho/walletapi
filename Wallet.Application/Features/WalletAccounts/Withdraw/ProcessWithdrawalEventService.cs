@@ -17,12 +17,14 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             _processor = processor;
         }
 
-        public async Task ProcessAsync(
+        public Task ProcessAsync(
             WalletWithdrawalEvent withdrawalEvent,
+            Guid eventId,
             CancellationToken cancellationToken = default)
         {
-            await _processor.ProcessAsync(
+            return _processor.ProcessAsync(
                 withdrawalEvent,
+                eventId,
                 cancellationToken);
         }
     }

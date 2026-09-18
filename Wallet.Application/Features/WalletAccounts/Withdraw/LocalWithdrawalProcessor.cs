@@ -21,10 +21,12 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
 
         public Task ProcessAsync(
             WalletWithdrawalEvent withdrawalEvent,
+            Guid eventId,
             CancellationToken cancellationToken = default)
         {
             return _paymentProcessor.ProcessAsync(
                 withdrawalEvent,
+                eventId,
                 cancellationToken);
         }
     }

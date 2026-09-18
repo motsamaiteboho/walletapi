@@ -73,7 +73,8 @@ namespace Wallet.Worker.Messaging
         {
             var body = args.Message.Body.ToString();
 
-            var withdrawalEvent = JsonSerializer.Deserialize<WalletWithdrawalEvent>(body);
+            var withdrawalEvent =
+                JsonSerializer.Deserialize<WalletWithdrawalEvent>(body);
 
             if (withdrawalEvent is null)
             {
@@ -81,30 +82,25 @@ namespace Wallet.Worker.Messaging
                     "Unable to deserialize WalletWithdrawalEvent.");
             }
 
+            if (!Guid.TryParse(
+                    args.Message.MessageId,
+                    out var eventId))
+            {
+                throw new InvalidOperationException(
+                    $"Invalid event ID: {args.Message.MessageId}");
+            }
+
             using var scope = _scopeFactory.CreateScope();
 
-            var handler = scope.ServiceProvider
-                .GetRequiredService<WithdrawalEventHandler>();
+            var processor = scope.ServiceProvider
+                .GetRequiredService<ProcessWithdrawalEventService>();
 
-            try
-            {
-                await handler.HandleAsync(
-                    withdrawalEvent,
-                    args.CancellationToken);
+            await processor.ProcessAsync(
+                withdrawalEvent,
+                eventId,
+                args.CancellationToken);
 
-                await args.CompleteMessageAsync(args.Message);
-            }
-            catch (PaymentValidationException exception)
-            {
-                await args.DeadLetterMessageAsync(
-                    args.Message,
-                    "PaymentValidationFailure",
-                    exception.Message);
-            }
-            catch (PaymentProcessingException)
-            {
-                throw;
-            }
+            await args.CompleteMessageAsync(args.Message);
         }
 
         private Task ProcessErrorAsync(

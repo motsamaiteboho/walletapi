@@ -30,6 +30,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             {
                 await _processor.ProcessAsync(
                     withdrawalEvent,
+                    Guid.NewGuid(),
                     cancellationToken);
             }
             catch (PaymentValidationException exception)

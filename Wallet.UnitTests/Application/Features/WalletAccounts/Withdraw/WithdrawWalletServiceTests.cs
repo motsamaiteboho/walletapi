@@ -290,11 +290,12 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                 "ZAR",
                 DateTime.UtcNow);
 
-            await service.ProcessAsync(withdrawalEvent);
+            await service.ProcessAsync(withdrawalEvent, Guid.NewGuid());
 
             processor.Verify(
                 x => x.ProcessAsync(
                     withdrawalEvent,
+                    It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -307,6 +308,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             processor
                 .Setup(x => x.ProcessAsync(
                     It.IsAny<WalletWithdrawalEvent>(),
+                    It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("Payment failed."));
 
@@ -321,7 +323,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
                 DateTime.UtcNow);
 
             await Assert.ThrowsAsync<InvalidOperationException>(
-                () => service.ProcessAsync(withdrawalEvent));
+                () => service.ProcessAsync(withdrawalEvent, Guid.NewGuid()));
         }
     }
 }

@@ -44,6 +44,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             _processorMock.Verify(
                 x => x.ProcessAsync(
                     withdrawalEvent,
+                    It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()),
                 Times.Once);
         }
@@ -55,6 +56,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             _processorMock
                 .Setup(x => x.ProcessAsync(
                     It.IsAny<WalletWithdrawalEvent>(),
+                    It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(
                     new PaymentProcessingException(
@@ -81,6 +83,7 @@ namespace Wallet.UnitTests.Application.Features.WalletAccounts.Withdraw
             _processorMock
                 .Setup(x => x.ProcessAsync(
                     It.IsAny<WalletWithdrawalEvent>(),
+                    It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(
                     new PaymentValidationException(

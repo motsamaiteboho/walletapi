@@ -11,6 +11,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw.Payment
     {
         Task ProcessAsync(
             WalletWithdrawalEvent withdrawalEvent,
+            Guid eventId,
             CancellationToken cancellationToken = default);
     }
 }
