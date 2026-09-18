@@ -40,9 +40,6 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
 
             walletAccount.Withdraw(request.Amount);
 
-            await _unitOfWork.SaveChangesAsync(
-                cancellationToken);
-
             var withdrawalEvent = new WalletWithdrawalEvent(
                 walletAccount.Id,
                 request.Amount,
@@ -52,6 +49,9 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
 
             await _eventPublisher.PublishAsync(
                 withdrawalEvent,
+                cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(
                 cancellationToken);
 
             return new WithdrawWalletResponse(

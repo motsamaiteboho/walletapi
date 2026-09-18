@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Domain.Entities;
+using Wallet.Infrastructure.Persistence.Outbox;
 using Entities = Wallet.Domain.Entities;
 
 namespace Wallet.Infrastructure.Persistence
@@ -20,6 +21,9 @@ namespace Wallet.Infrastructure.Persistence
 
         public DbSet<WalletAccount> WalletAccounts =>
             Set<WalletAccount>();
+
+        public DbSet<OutboxMessage> OutboxMessages =>
+            Set<OutboxMessage>();
 
         protected override void OnModelCreating(
             ModelBuilder modelBuilder)

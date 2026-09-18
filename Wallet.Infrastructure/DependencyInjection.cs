@@ -30,7 +30,7 @@ namespace Wallet.Infrastructure
                 IWalletAccountRepository,
                 WalletAccountRepository>();
 
-            services.AddScoped<IEventPublisher,InMemoryEventPublisher>();
+            services.AddScoped<IEventPublisher, OutboxEventPublisher>();
 
             services.AddScoped<IUnitOfWork, WalletUnitOfWork>();
 
