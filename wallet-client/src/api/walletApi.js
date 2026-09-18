@@ -4,28 +4,39 @@ const API_BASE_URL =
 const WALLET_ID =
     "11111111-1111-1111-1111-111111111111";
 
+async function handleResponse(response) {
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail ||
+            data.title ||
+            "An unexpected error occurred."
+        );
+    }
+
+    return data;
+}
+
 export async function getBalance() {
     const response = await fetch(
         `${API_BASE_URL}/api/wallet-accounts/${WALLET_ID}/balance`
     );
 
-    if (!response.ok) {
-        throw new Error(
-            `Failed to retrieve wallet balance (${response.status})`
-        );
-    }
-
-    return response.json();
+    return handleResponse(response);
 }
 
-export async function withdraw(amount) {
+export async function withdraw(
+    amount,
+    idempotencyKey
+) {
     const response = await fetch(
         `${API_BASE_URL}/api/wallet-accounts/${WALLET_ID}/withdraw`,
         {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Idempotency-Key": crypto.randomUUID()
+                "Idempotency-Key": idempotencyKey
             },
             body: JSON.stringify({
                 amount: Number(amount)
@@ -33,15 +44,5 @@ export async function withdraw(amount) {
         }
     );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(
-            data.detail ||
-            data.title ||
-            "Withdrawal failed."
-        );
-    }
-
-    return data;
+    return handleResponse(response);
 }
