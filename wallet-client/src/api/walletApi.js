@@ -17,3 +17,31 @@ export async function getBalance() {
 
     return response.json();
 }
+
+export async function withdraw(amount) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/wallet-accounts/${WALLET_ID}/withdraw`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Idempotency-Key": crypto.randomUUID()
+            },
+            body: JSON.stringify({
+                amount: Number(amount)
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail ||
+            data.title ||
+            "Withdrawal failed."
+        );
+    }
+
+    return data;
+}
