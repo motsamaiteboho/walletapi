@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wallet.Domain.Enums;
 
 namespace Wallet.Domain.Entities
 {
@@ -16,7 +17,7 @@ namespace Wallet.Domain.Entities
 
         public decimal Amount { get; private set; }
 
-        public string Status { get; private set; }
+        public PaymentProcessingStatus Status { get; private set; }
 
         public DateTime CreatedAt { get; private set; }
 
@@ -27,9 +28,9 @@ namespace Wallet.Domain.Entities
         }
 
         public PaymentProcessingRecord(
-            Guid eventId,
-            Guid walletAccountId,
-            decimal amount)
+     Guid eventId,
+     Guid walletAccountId,
+     decimal amount)
         {
             if (eventId == Guid.Empty)
                 throw new ArgumentException(
@@ -50,13 +51,13 @@ namespace Wallet.Domain.Entities
             EventId = eventId;
             WalletAccountId = walletAccountId;
             Amount = amount;
-            Status = "Pending";
+            Status = PaymentProcessingStatus.Pending;
             CreatedAt = DateTime.UtcNow;
         }
 
         public void MarkAsProcessed()
         {
-            Status = "Processed";
+            Status = PaymentProcessingStatus.Processed;
             ProcessedAt = DateTime.UtcNow;
         }
     }

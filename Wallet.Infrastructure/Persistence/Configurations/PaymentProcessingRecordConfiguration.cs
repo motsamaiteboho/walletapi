@@ -30,6 +30,7 @@ namespace Wallet.Infrastructure.Persistence.Configurations
                 .IsRequired();
 
             builder.Property(x => x.Status)
+                .HasConversion<string>()
                 .HasMaxLength(20)
                 .IsRequired();
 

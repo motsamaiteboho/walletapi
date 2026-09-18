@@ -23,9 +23,9 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw.Payment
         }
 
         public async Task ProcessAsync(
-            WalletWithdrawalEvent withdrawalEvent,
-            Guid eventId,
-            CancellationToken cancellationToken = default)
+    WalletWithdrawalEvent withdrawalEvent,
+    Guid eventId,
+    CancellationToken cancellationToken = default)
         {
             var existingRecord =
                 await _repository.GetByEventIdAsync(
@@ -35,7 +35,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw.Payment
             if (existingRecord is not null)
             {
                 _logger.LogInformation(
-                    "Payment already processed. EventId={EventId}",
+                    "Payment processing record already exists. EventId={EventId}",
                     eventId);
 
                 return;
@@ -50,11 +50,17 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw.Payment
                 record,
                 cancellationToken);
 
-            // Simulate the downstream payment.
+            await _repository.SaveChangesAsync(
+                cancellationToken);
+
             _logger.LogInformation(
-                "Processing payment. EventId={EventId}, WalletAccountId={WalletAccountId}, Amount={Amount}, Currency={Currency}",
+                "Payment processing claimed. EventId={EventId}",
+                eventId);
+
+            // Local simulation of the downstream payment.
+            _logger.LogInformation(
+                "Processing payment. EventId={EventId}, Amount={Amount}, Currency={Currency}",
                 eventId,
-                withdrawalEvent.WalletAccountId,
                 withdrawalEvent.Amount,
                 withdrawalEvent.Currency);
 
