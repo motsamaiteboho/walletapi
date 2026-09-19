@@ -631,7 +631,7 @@ Install the following:
 ## 24.1 Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/motsamaiteboho/walletapi.git
 cd Wallet.Api
 ```
 
@@ -1372,9 +1372,7 @@ Then verify:
 
 The complete source code, commit history and documentation are maintained in the Git repository.
 
-```text
-<repository-url>
-```
+[<repository-url>](https://github.com/motsamaiteboho/walletapi.git)
 
 ---
 
