@@ -794,12 +794,27 @@ VITE_API_BASE_URL
 Example:
 
 ```text
-VITE_API_BASE_URL=https://localhost:7143
+VITE_API_BASE_URL=http://localhost:7143
 ```
 
 The exact API port depends on the local launch configuration.
 
 ---
+
+##Application Demo
+
+A short video demonstrating how to configure, run, and test the application locally is available below:
+
+▶️ **[Watch the Wallet API Demo](https://youtu.be/2XhmrZDDif4)**
+
+The demonstration covers:
+- Starting the Docker infrastructure
+- Starting the Wallet API
+- Starting the background worker
+- Starting the React client
+- Retrieving the wallet balance
+- Performing a withdrawal
+- Viewing the resulting transaction
 
 # 32. Initial Wallet
 
