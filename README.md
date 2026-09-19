@@ -1372,8 +1372,9 @@ Then verify:
 
 The complete source code, commit history and documentation are maintained in the Git repository.
 
-[<repository-url>](https://github.com/motsamaiteboho/walletapi.git)
-
+```text
+https://github.com/motsamaiteboho/walletapi.git
+```
 ---
 
 # 50. License
