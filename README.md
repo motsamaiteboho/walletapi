@@ -717,7 +717,12 @@ Update-Database -Project Wallet.Infrastructure -StartupProject Wallet.Api
 Or use the equivalent EF Core CLI command.
 
 ```powershell
-Update-Database -Project Wallet.Infrastructure -StartupProject Wallet.Api
+dotnet ef database update --project Wallet.Infrastructure --startup-project Wallet.Api
+```
+If dotnet-ef is not already installed, install the version used by the project:
+
+```powershell
+dotnet tool install --global dotnet-ef --version 9.0.20 
 ```
 ---
 
