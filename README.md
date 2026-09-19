@@ -90,74 +90,10 @@ The implementation also provides additional engineering capabilities without cha
 
 The solution follows a Clean Architecture approach.
 
-```text
-                         +-----------------+
-                         |   React Client  |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         |   Wallet API    |
-                         | ASP.NET Core    |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         |   Application   |
-                         |    Services     |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         |     Domain      |
-                         | WalletAccount   |
-                         +-----------------+
-                                  |
-                                  v
-                         +-----------------+
-                         | Infrastructure  |
-                         | EF Core/Npgsql  |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         |   PostgreSQL    |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         | Transactional   |
-                         |     Outbox      |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         | Outbox Publisher|
-                         |     Worker      |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         | Azure Service   |
-                         |      Bus        |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         | Withdrawal      |
-                         |    Worker       |
-                         +--------+--------+
-                                  |
-                                  v
-                         +-----------------+
-                         |    Payment      |
-                         |   Processor     |
-                         +-----------------+
-```
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/68ab735d-1c84-46ee-98fd-2eb8ac317a5c" />
+
 
 For local development, the Azure Service Bus Emulator is used.
-
-For production, the architecture can be deployed using Azure managed services.
 
 ---
 
@@ -434,20 +370,8 @@ Withdrawal events are implemented using the Transactional Outbox pattern.
 
 Instead of publishing directly to Service Bus from the API, the event is stored in PostgreSQL as part of the same operation that updates the wallet.
 
-```text
-Withdrawal Request
-        |
-        +-- Update Wallet Balance
-        |
-        +-- Create Wallet Transaction
-        |
-        +-- Store Idempotency Record
-        |
-        +-- Store Outbox Message
-                 |
-                 v
-            DB Commit
-```
+<img width="1312" height="1199" alt="image" src="https://github.com/user-attachments/assets/583fc9a6-8d72-40f9-9fb6-e223398837cd" />
+
 
 Only after the database transaction succeeds does the outbox publisher send the event to Service Bus.
 
@@ -481,24 +405,8 @@ wallet-withdrawals
 
 The event flow is:
 
-```text
-Wallet API
-     |
-     v
-PostgreSQL Outbox
-     |
-     v
-Outbox Publisher
-     |
-     v
-Azure Service Bus
-     |
-     v
-Withdrawal Worker
-     |
-     v
-Payment Processor
-```
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/e8149b76-620a-4fbb-8ee4-721637963e44" />
+
 
 ---
 
@@ -508,23 +416,7 @@ The consumer uses manual message completion.
 
 The message is only completed after successful downstream processing.
 
-```text
-Receive message
-      |
-      v
-Deserialize event
-      |
-      v
-Process withdrawal
-      |
-      v
-Success?
-   /     \
- Yes      No
-  |        |
-  v        v
-Complete Retry/DLQ
-```
+<img width="1222" height="1287" alt="image" src="https://github.com/user-attachments/assets/d4c5a6db-ab3e-423f-a506-ac048d34a6cb" />
 
 This prevents messages from being acknowledged before the actual processing has completed.
 
@@ -633,27 +525,8 @@ This allows requests to be traced across the application.
 
 Conceptually:
 
-```text
-HTTP Request
-     |
-     v
-Correlation ID
-     |
-     v
-Wallet Operation
-     |
-     v
-Database
-     |
-     v
-Outbox
-     |
-     v
-Service Bus
-     |
-     v
-Worker
-```
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/36316ed6-2514-4573-9547-f8696b91c490" />
+
 
 Correlation IDs are particularly useful when troubleshooting asynchronous workflows.
 
@@ -1018,47 +891,8 @@ GET /api/wallet-accounts/11111111-1111-1111-1111-111111111111/transactions
 
 A successful withdrawal follows this sequence:
 
-```text
-Client
-  |
-  | POST /withdraw
-  v
-Wallet API
-  |
-  v
-Validate request
-  |
-  v
-Load WalletAccount
-  |
-  v
-Check balance
-  |
-  v
-Withdraw
-  |
-  +----------------+
-  |                |
-  v                v
-Transaction      Outbox
-  |                |
-  +-------+--------+
-          |
-          v
-      DB Commit
-          |
-          v
-   Outbox Publisher
-          |
-          v
-     Service Bus
-          |
-          v
- Withdrawal Worker
-          |
-          v
- Payment Processor
-```
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/2c07cab6-c064-42cf-85e8-683cadc3ac6c" />
+
 
 ---
 
@@ -1449,169 +1283,61 @@ Each major capability was tested before moving to the next stage.
 ✓ CI automation
 ```
 
-The additional Azure services such as API Management, Key Vault, Container Apps, Azure PostgreSQL, Redis and Application Insights are identified as potential production improvements rather than prerequisites for the assessment.
+The additional Azure services such as API Management, Key Vault, Container Apps, Azure PostgreSQL, Redis and Application Insights are identified as potential production improvements
 
 ---
 
-# 45. AI Usage
+## 45. AI Usage
 
-AI tools were used as development assistants during implementation.
+AI tools, primarily **ChatGPT**, were used as development assistants throughout the implementation of the wallet application.
 
-The primary AI tool used was **ChatGPT**.
+AI was used to support:
 
-AI assistance was used for:
-
-- Architecture exploration
-- Clean Architecture design
-- .NET implementation guidance
-- EF Core configuration
+- Architecture and design exploration
+- .NET and EF Core troubleshooting
 - PostgreSQL configuration
-- Dependency injection troubleshooting
 - Azure Service Bus implementation
-- Worker Service implementation
-- Retry and Dead Letter Queue design
-- Idempotency design
-- Concurrency considerations
-- Unit test design
-- Integration test design
-- Code review
-- Error analysis
-- Documentation
+- Transactional Outbox design
+- Idempotency and concurrency considerations
+- Test design and troubleshooting
+- Technical documentation
 
-AI-generated suggestions and code were reviewed, adapted and tested during implementation.
+The development process was iterative. AI was used to explore possible approaches, investigate errors, and review design decisions. Proposed solutions were then adapted to the project's requirements and validated through compilation, automated testing, and local end-to-end testing.
 
-AI was not treated as an authoritative source. Technical decisions were evaluated against the assessment requirements, the application's architecture and actual runtime behaviour.
+AI output was therefore treated as development guidance rather than as an authoritative implementation. Final technical decisions and changes were reviewed and validated as part of the development process.
 
 ---
 
-# 46. AI Usage Artifacts
+## 46. AI Usage Artifacts
 
-The following are representative examples of prompts used during development.
+The following are representative areas where AI-assisted discussions informed implementation decisions:
 
-## Architecture
+| Area | AI-Assisted Development |
+|---|---|
+| Architecture | Exploring Clean Architecture boundaries, project responsibilities, and dependency direction |
+| EF Core / PostgreSQL | Investigating persistence configuration and optimistic concurrency |
+| Transactional Outbox | Exploring reliable event persistence and asynchronous publishing |
+| Azure Service Bus | Working through message publishing, consumption, retries, and dead-letter handling |
+| Idempotency | Exploring duplicate request and duplicate message handling |
+| Dependency Injection | Troubleshooting service lifetimes and scoped dependencies in background workers |
+| Testing | Identifying scenarios for withdrawal, event processing, idempotency, and failure handling |
+| Troubleshooting | Investigating build, database, EF Core, worker, and messaging issues |
+| Documentation | Structuring technical documentation and architecture diagrams |
 
-```text
-Design a Clean Architecture structure for a .NET wallet API
-that supports balance retrieval, withdrawals, transactions and
-withdrawal events while keeping the domain independent of
-infrastructure.
-```
+### Key AI-Assisted Outputs
 
----
+Several AI-assisted discussions directly informed implementation decisions, including:
 
-## Entity Framework
+- **Clean Architecture:** Guidance around dependency direction led to application-level abstractions being separated from their Infrastructure implementations.
+- **Transactional Outbox:** Guidance informed the decision to persist the withdrawal event together with the wallet changes before publishing it asynchronously.
+- **Azure Service Bus:** Guidance informed manual message completion and the handling of transient failures through retries and permanent failures through dead-letter processing.
+- **Idempotency:** Guidance informed the use of idempotency records for withdrawal requests and event/message processing.
+- **Optimistic Concurrency:** Guidance informed the use of PostgreSQL/EF Core concurrency protection for wallet balance updates.
+- **Testing:** AI-assisted discussions helped identify test scenarios covering successful withdrawals, insufficient funds, idempotency, transactions, event publishing, and processing failures.
 
-```text
-How should optimistic concurrency be implemented for a wallet
-balance using EF Core and PostgreSQL?
-```
+The AI-assisted outputs were reviewed and adapted during implementation and validated through automated tests and local runtime testing. 
 
----
-
-## Transactional Outbox
-
-```text
-Explain how to implement a transactional outbox pattern in
-ASP.NET Core with PostgreSQL so that a wallet update and
-withdrawal event are persisted atomically.
-```
-
----
-
-## Azure Service Bus
-
-```text
-Explain how to implement an Azure Service Bus consumer in a
-.NET Worker Service using manual message completion, retry
-handling and dead-letter processing.
-```
-
----
-
-## Dependency Injection
-
-```text
-Why can't a singleton Service Bus consumer depend directly on
-a scoped application service, and how should dependency scopes
-be handled in a background worker?
-```
-
----
-
-## Testing
-
-```text
-Create unit tests for a withdrawal event processor that verify
-successful processing, transient payment failures and permanent
-payment validation failures.
-```
-
----
-
-## Idempotency
-
-```text
-How can a downstream Service Bus consumer prevent duplicate
-payment processing when Service Bus provides at-least-once
-delivery?
-```
-
----
-
-## Architectural Review
-
-AI assistance was also used interactively to identify design problems during implementation.
-
-For example, an initial repository abstraction was placed in the Infrastructure layer while an Application service needed to consume it.
-
-This was identified as an undesirable dependency direction.
-
-The design was changed so that:
-
-```text
-Application
-    |
-    +-- Defines repository interface
-              ^
-              |
-Infrastructure
-    +-- Implements repository
-```
-
-This preserves the intended Clean Architecture dependency direction.
-
----
-
-# 47. Responsible AI Development
-
-AI-generated code was treated as a starting point rather than automatically accepted implementation.
-
-The development process included:
-
-1. Generate or discuss an approach with AI.
-2. Review the proposed architecture.
-3. Compare the proposal against the assessment requirements.
-4. Implement the change.
-5. Build the solution.
-6. Run automated tests.
-7. Run the application locally.
-8. Validate runtime behaviour.
-9. Correct architectural or implementation issues when discovered.
-
-Examples of issues discovered and corrected during development include:
-
-- Dependency injection lifetime mismatches
-- Application/Infrastructure dependency direction
-- Worker dependency registration
-- Database connection configuration
-- EF Core package requirements
-- Service Bus message handling behaviour
-
-This workflow ensured that AI assistance supported developer decision-making rather than replacing it.
-
----
-
-# 48. Local Development Checklist
+# 47. Local Development Checklist
 
 Before running the complete system:
 
