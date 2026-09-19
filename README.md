@@ -716,6 +716,9 @@ Update-Database -Project Wallet.Infrastructure -StartupProject Wallet.Api
 
 Or use the equivalent EF Core CLI command.
 
+```powershell
+Update-Database -Project Wallet.Infrastructure -StartupProject Wallet.Api
+```
 ---
 
 # 29. Run the API
