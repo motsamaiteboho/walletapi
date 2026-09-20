@@ -2,7 +2,7 @@
 
 A backend-focused wallet application built with **ASP.NET Core**, **PostgreSQL**, **Entity Framework Core**, and **Azure Service Bus**.
 
-The solution implements the core wallet functionality required by the technical assessment:
+The solution implements the core wallet functionality:
 
 - Retrieve a wallet's current balance
 - Withdraw funds
@@ -12,11 +12,7 @@ The solution implements the core wallet functionality required by the technical 
 - Publish a withdrawal event
 - Process withdrawal events asynchronously
 - Handle transient failures through Service Bus retries
-- Support dead-letter processing
 - Provide automated unit and integration tests
-
-The solution also demonstrates production-oriented engineering practices, including:
-
 - Clean Architecture
 - Optimistic concurrency
 - Request idempotency
@@ -25,7 +21,6 @@ The solution also demonstrates production-oriented engineering practices, includ
 - Structured logging
 - Correlation IDs
 - Problem Details error responses
-- Downstream payment processing abstraction
 - React demonstration client
 - CI build and test automation
 
@@ -511,8 +506,6 @@ The database uses a unique constraint on the event identity.
 
 This provides protection against duplicate downstream processing.
 
-For a real external payment provider, the payment reference should also be used as an idempotency key with the provider.
-
 ---
 
 # 19. Correlation IDs
@@ -794,12 +787,27 @@ VITE_API_BASE_URL
 Example:
 
 ```text
-VITE_API_BASE_URL=https://localhost:7143
+VITE_API_BASE_URL=http://localhost:7143
 ```
 
 The exact API port depends on the local launch configuration.
 
 ---
+
+##Application Demo
+
+A short video demonstrating how to configure, run, and test the application locally is available below:
+
+▶️ **[Watch the Wallet API Demo](https://youtu.be/2XhmrZDDif4)**
+
+The demonstration covers:
+- Starting the Docker infrastructure
+- Starting the Wallet API
+- Starting the background worker
+- Starting the React client
+- Retrieving the wallet balance
+- Performing a withdrawal
+- Viewing the resulting transaction
 
 # 32. Initial Wallet
 
@@ -1304,7 +1312,6 @@ AI was used to support:
 - Architecture and design exploration
 - .NET and EF Core troubleshooting
 - PostgreSQL configuration
-- Azure Service Bus implementation
 - Transactional Outbox design
 - Idempotency and concurrency considerations
 - Test design and troubleshooting
