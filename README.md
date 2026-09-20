@@ -2,7 +2,7 @@
 
 A backend-focused wallet application built with **ASP.NET Core**, **PostgreSQL**, **Entity Framework Core**, and **Azure Service Bus**.
 
-The solution implements the core wallet functionality required by the technical assessment:
+The solution implements the core wallet functionality:
 
 - Retrieve a wallet's current balance
 - Withdraw funds
@@ -12,11 +12,7 @@ The solution implements the core wallet functionality required by the technical 
 - Publish a withdrawal event
 - Process withdrawal events asynchronously
 - Handle transient failures through Service Bus retries
-- Support dead-letter processing
 - Provide automated unit and integration tests
-
-The solution also demonstrates production-oriented engineering practices, including:
-
 - Clean Architecture
 - Optimistic concurrency
 - Request idempotency
@@ -25,7 +21,6 @@ The solution also demonstrates production-oriented engineering practices, includ
 - Structured logging
 - Correlation IDs
 - Problem Details error responses
-- Downstream payment processing abstraction
 - React demonstration client
 - CI build and test automation
 
@@ -510,8 +505,6 @@ Skip          Process
 The database uses a unique constraint on the event identity.
 
 This provides protection against duplicate downstream processing.
-
-For a real external payment provider, the payment reference should also be used as an idempotency key with the provider.
 
 ---
 
@@ -1319,7 +1312,6 @@ AI was used to support:
 - Architecture and design exploration
 - .NET and EF Core troubleshooting
 - PostgreSQL configuration
-- Azure Service Bus implementation
 - Transactional Outbox design
 - Idempotency and concurrency considerations
 - Test design and troubleshooting
