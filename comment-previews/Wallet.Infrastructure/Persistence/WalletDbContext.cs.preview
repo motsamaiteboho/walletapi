@@ -1,0 +1,55 @@
+// COMMENT PREVIEW: Inline comments will be added above public types and members.
+// This is a preview file only. No changes applied to original source yet.
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Text;
+using System.Threading.Tasks;
+using Wallet.Domain.Entities;
+using Wallet.Infrastructure.Persistence.Outbox;
+using Entities = Wallet.Domain.Entities;
+
+namespace Wallet.Infrastructure.Persistence
+{
+	// EF Core DbContext for wallet-related persistence (accounts, transactions, outbox, idempotency).
+	public class WalletDbContext : DbContext
+	{
+		public WalletDbContext(
+			DbContextOptions<WalletDbContext> options)
+			: base(options)
+		{
+		}
+
+		// DbSet for wallet accounts.
+		public DbSet<WalletAccount> WalletAccounts =>
+			Set<WalletAccount>();
+
+		// DbSet for outbox messages used for reliable event publishing.
+		public DbSet<OutboxMessage> OutboxMessages =>
+			Set<OutboxMessage>();
+
+		// DbSet tracking idempotency records to enforce idempotent operations.
+		public DbSet<IdempotencyRecordEntity> IdempotencyRecords =>
+			Set<IdempotencyRecordEntity>();
+
+		// DbSet for wallet transactions history.
+		public DbSet<WalletTransaction> WalletTransactions =>
+			Set<WalletTransaction>();
+
+		public DbSet<PaymentProcessingRecord> PaymentProcessingRecords
+		{
+			get;
+			set;
+		}
+
+		// Apply configuration mappings from the assembly on model creating.
+		protected override void OnModelCreating(
+			ModelBuilder modelBuilder)
+		{
+			modelBuilder.ApplyConfigurationsFromAssembly(
+				typeof(WalletDbContext).Assembly);
+		}
+	}
+}

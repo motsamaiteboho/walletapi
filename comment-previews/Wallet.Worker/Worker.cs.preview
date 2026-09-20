@@ -1,0 +1,38 @@
+// COMMENT PREVIEW: Inline comments will be added above public types and members.
+// This is a preview file only. No changes applied to original source yet.
+using Wallet.Worker.Messaging;
+
+namespace Wallet.Worker
+{
+	// Background worker that starts message consumer and coordinates message sending.
+	public class Worker : BackgroundService
+	{
+		// Logger for worker lifecycle messages.
+		private readonly ILogger<Worker> _logger;
+		// Sender used to publish messages to the service bus.
+		private readonly ServiceBusMessageSender _sender;
+		// Consumer that listens for incoming messages from the service bus.
+		private readonly ServiceBusMessageConsumer _consumer;
+
+		// Construct a Worker with required messaging dependencies and logger.
+		public Worker(
+			ILogger<Worker> logger,
+			ServiceBusMessageSender sender,
+			ServiceBusMessageConsumer consumer)
+		{
+			_logger = logger;
+			_sender = sender;
+			_consumer = consumer;
+		}
+
+		// Main execution loop: logs startup and starts the message consumer.
+		protected override async Task ExecuteAsync( CancellationToken stoppingToken)
+		{
+			_logger.LogInformation(
+				"Wallet Worker started.");
+
+			await _consumer.StartAsync(
+				stoppingToken);
+		}
+	}
+}

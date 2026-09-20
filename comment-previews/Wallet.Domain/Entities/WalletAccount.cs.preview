@@ -1,0 +1,81 @@
+// COMMENT PREVIEW: Inline comments will be added above public types and members.
+// This is a preview file only. No changes applied to original source yet.
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Wallet.Domain.Exceptions;
+
+namespace Wallet.Domain.Entities
+{
+	// Domain entity representing a wallet account with balance and currency.
+	public class WalletAccount
+	{
+		// Unique identifier of the wallet account.
+		public Guid Id { get; private set; }
+
+		// Current available balance.
+		public decimal Balance { get; private set; }
+
+		// Currency code for the wallet (e.g., "USD").
+		public string Currency { get; private set; }
+
+		// Timestamp when the wallet was created.
+		public DateTime CreatedAt { get; private set; }
+
+		// Concurrency/version field used by persistence.
+		public uint Version { get; private set; }
+
+		// Parameterless ctor required by EF Core.
+		private WalletAccount()
+		{
+			// Required by EF Core
+		}
+
+		// Create a new wallet account with initial balance and currency.
+		public WalletAccount(
+			Guid id,
+			decimal initialBalance,
+			string currency)
+		{
+			if (id == Guid.Empty)
+				throw new ArgumentException(
+					"Wallet ID cannot be empty.",
+					nameof(id));
+
+			if (initialBalance < 0)
+				throw new ArgumentException(
+					"Initial balance cannot be negative.",
+					nameof(initialBalance));
+
+			if (string.IsNullOrWhiteSpace(currency))
+				throw new ArgumentException(
+					"Currency is required.",
+					nameof(currency));
+
+			Id = id;
+			Balance = initialBalance;
+			Currency = currency;
+			CreatedAt = DateTime.UtcNow;
+		}
+
+		// Withdraw an amount from the wallet; throws on invalid amount or insufficient funds.
+		public void Withdraw(decimal amount)
+		{
+			if (amount <= 0)
+			{
+				throw new ArgumentException(
+					"Withdrawal amount must be greater than zero.",
+					nameof(amount));
+			}
+
+			if (amount > Balance)
+			{
+				throw new InsufficientFundsException();
+			}
+
+			Balance -= amount;
+		}
+	}
+}
