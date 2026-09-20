@@ -1391,7 +1391,3 @@ The complete source code, commit history and documentation are maintained in the
 https://github.com/motsamaiteboho/walletapi.git
 ```
 ---
-
-# 50. License
-
-This project was developed as part of a technical assessment.
