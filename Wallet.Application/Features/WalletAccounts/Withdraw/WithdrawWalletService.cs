@@ -40,15 +40,16 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             _logger = logger;
         }
 
-        // Executes a withdrawal for the specified wallet account.
-        // Validates idempotency, applies domain logic, records a transaction,
-        // publishes an event and saves changes atomically.
+    // Executes a withdrawal for the specified wallet account.
+    // Validates idempotency, applies domain logic, records a transaction,
+    // publishes an event and saves changes atomically.
     public async Task<WithdrawWalletResponse?> ExecuteAsync(
         Guid walletAccountId,
         WithdrawWalletRequest request,
         string idempotencyKey,
         CancellationToken cancellationToken = default)
         {
+            // Ensure an idempotency key was provided to allow safe retries.
             if (string.IsNullOrWhiteSpace(idempotencyKey))
             {
                 throw new ArgumentException(
@@ -56,18 +57,24 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                     nameof(idempotencyKey));
             }
 
+            // Compute a deterministic hash of the request so we can detect
+            // reuse of the same idempotency key with a different payload.
             var requestHash = CreateRequestHash(request);
 
+            // Look up an existing idempotency record for this wallet and key.
             var existingRecord =
                 await _idempotencyRepository.GetAsync(
                     walletAccountId,
                     idempotencyKey,
                     cancellationToken);
 
+            // If an existing record is present, validate the hash and return
+            // the stored response to enforce idempotent behavior.
             if (existingRecord is not null)
             {
                 if (existingRecord.RequestHash != requestHash)
                 {
+                    // Same key but different payload — treat as a conflict.
                     throw new IdempotencyKeyConflictException();
                 }
 
@@ -81,6 +88,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                     existingRecord.ResponsePayload);
             }
 
+            // Load the wallet account from the repository.
             var walletAccount =
                 await _repository.GetByIdAsync(
                     walletAccountId,
@@ -95,6 +103,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                 return null;
             }
 
+            // Log the start of the withdrawal processing.
             _logger.LogInformation(
                 "Processing wallet withdrawal. " +
                 "WalletAccountId={WalletAccountId}, Amount={Amount}, Currency={Currency}",
@@ -102,13 +111,17 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                 request.Amount,
                 walletAccount.Currency);
 
+            // Apply domain logic for the withdrawal. This may throw domain exceptions
+            // such as insufficient funds, which should propagate to the caller.
             walletAccount.Withdraw(request.Amount);
 
+            // Log state after applying the withdrawal.
             _logger.LogInformation( "Wallet withdrawal applied. WalletAccountId={WalletAccountId}, Amount={Amount}, RemainingBalance={RemainingBalance}",
                 walletAccount.Id,
                 request.Amount,
                 walletAccount.Balance);
 
+            // Create a transaction entity representing this withdrawal.
             var transaction = new WalletTransaction(
                 Guid.NewGuid(),
                 walletAccount.Id,
@@ -120,6 +133,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                 transaction,
                 cancellationToken);
 
+            // Publish a domain event to inform other systems of the withdrawal.
             var withdrawalEvent = new WalletWithdrawalEvent(
                 walletAccount.Id,
                 request.Amount,
@@ -131,12 +145,14 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
                 withdrawalEvent,
                 cancellationToken);
 
+            // Prepare the response payload for the caller.
             var response = new WithdrawWalletResponse(
                 walletAccount.Id,
                 request.Amount,
                 walletAccount.Balance,
                 walletAccount.Currency);
 
+            // Create and persist an idempotency record capturing the request/response.
             var idempotencyRecord = new IdempotencyRecord(
                 walletAccount.Id,
                 idempotencyKey,
@@ -149,11 +165,16 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
 
             try
             {
+                // Persist all changes atomically via the unit of work. A concurrent
+                // request may cause a DuplicateIdempotencyKeyException if it inserted
+                // the same idempotency key between our check and SaveChanges.
                 await _unitOfWork.SaveChangesAsync(
                     cancellationToken);
             }
             catch (DuplicateIdempotencyKeyException)
             {
+                // A concurrent request created the idempotency record. Load it and
+                // return its response if it matches the current request.
                 existingRecord =
                     await _idempotencyRepository.GetAsync(
                         walletAccount.Id,
