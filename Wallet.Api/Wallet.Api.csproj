@@ -4,6 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Generate XML documentation file for Swagger to include remarks and parameter descriptions -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Suppress missing XML comment warnings (optional) -->
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
