@@ -18,6 +18,7 @@ namespace Wallet.Infrastructure.Persistence.Idempotency
             _context = context;
         }
 
+        // Retrieves an idempotency record entity and maps it to the domain record.
         public async Task<IdempotencyRecord?> GetAsync(
             Guid walletAccountId,
             string idempotencyKey,
@@ -45,6 +46,7 @@ namespace Wallet.Infrastructure.Persistence.Idempotency
                 entity.CreatedAt);
         }
 
+        // Persists a new idempotency record entity for later lookup.
         public async Task AddAsync(
             IdempotencyRecord record,
             CancellationToken cancellationToken = default)

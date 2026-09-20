@@ -13,6 +13,7 @@ namespace Wallet.Application
 {
     public static class DependencyInjection
     {
+        // Registers application services into the DI container.
         public static IServiceCollection AddApplication(
             this IServiceCollection services)
         {

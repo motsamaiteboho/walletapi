@@ -22,6 +22,8 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             _logger = logger;
         }
 
+        // Handles a wallet withdrawal event by delegating to the processor and
+        // mapping processing exceptions to appropriate logging and rethrowing.
         public async Task HandleAsync(
             WalletWithdrawalEvent withdrawalEvent,
             CancellationToken cancellationToken = default)

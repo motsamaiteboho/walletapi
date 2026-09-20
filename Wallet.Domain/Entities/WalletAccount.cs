@@ -19,11 +19,13 @@ namespace Wallet.Domain.Entities
 
         public uint Version { get; private set; }
 
+        // Parameterless ctor required by EF Core for materialization.
         private WalletAccount()
         {
             // Required by EF Core
         }
 
+        // Creates a new wallet account ensuring valid initial state.
         public WalletAccount(
             Guid id,
             decimal initialBalance,
@@ -50,6 +52,8 @@ namespace Wallet.Domain.Entities
             CreatedAt = DateTime.UtcNow;
         }
 
+        // Withdraws an amount from the account. Validates amount and throws
+        // InsufficientFundsException when balance is insufficient.
         public void Withdraw(decimal amount)
         {
             if (amount <= 0)

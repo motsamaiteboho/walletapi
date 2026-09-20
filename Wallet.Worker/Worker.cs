@@ -8,6 +8,7 @@ namespace Wallet.Worker
         private readonly ServiceBusMessageSender _sender;
         private readonly ServiceBusMessageConsumer _consumer;
 
+        // Constructs the worker with required messaging dependencies.
         public Worker(
             ILogger<Worker> logger,
             ServiceBusMessageSender sender,
@@ -18,6 +19,8 @@ namespace Wallet.Worker
             _consumer = consumer;
         }
 
+        // Main execution entry for the BackgroundService. Starts the consumer and
+        // keeps the background task alive until cancellation is requested.
         protected override async Task ExecuteAsync( CancellationToken stoppingToken)
         {
             _logger.LogInformation(

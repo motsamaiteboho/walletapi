@@ -37,6 +37,7 @@ namespace Wallet.Infrastructure.Persistence
             set;
         }
 
+        // Apply all IEntityTypeConfiguration mappings from this assembly.
         protected override void OnModelCreating(
             ModelBuilder modelBuilder)
         {

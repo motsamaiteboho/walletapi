@@ -20,6 +20,7 @@ namespace Wallet.Infrastructure.Events
             _context = context;
         }
 
+        // Stores the event payload in the outbox table for later reliable delivery.
         public async Task PublishAsync<T>(
             T @event,
             CancellationToken cancellationToken = default)

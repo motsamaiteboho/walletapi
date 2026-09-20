@@ -8,6 +8,8 @@ namespace Wallet.Application.Abstractions
 {
     public interface IUnitOfWork
     {
+        // Persists pending changes to the underlying store in a transactional
+        // manner where supported.
         Task SaveChangesAsync(
             CancellationToken cancellationToken = default);
     }

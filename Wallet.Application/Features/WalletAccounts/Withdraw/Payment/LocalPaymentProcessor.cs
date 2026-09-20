@@ -22,6 +22,8 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw.Payment
             _logger = logger;
         }
 
+        // Processes the withdrawal payment locally: creates a processing record,
+        // simulates downstream processing and marks the record as processed.
         public async Task ProcessAsync(
     WalletWithdrawalEvent withdrawalEvent,
     Guid eventId,

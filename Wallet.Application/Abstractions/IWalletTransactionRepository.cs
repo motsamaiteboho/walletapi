@@ -9,6 +9,7 @@ namespace Wallet.Application.Abstractions
 {
     public interface IWalletTransactionRepository
     {
+        // Adds a wallet transaction to the repository for persistence.
         Task AddAsync(
             WalletTransaction transaction,
             CancellationToken cancellationToken = default);

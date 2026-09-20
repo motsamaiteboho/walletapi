@@ -17,6 +17,7 @@ namespace Wallet.Application.Features.WalletAccounts.GetTransactions
             _repository = repository;
         }
 
+        // Retrieves transactions for a wallet account and maps them to response DTOs.
         public async Task<IReadOnlyList<WalletTransactionResponse>>
             ExecuteAsync(
                 Guid walletAccountId,

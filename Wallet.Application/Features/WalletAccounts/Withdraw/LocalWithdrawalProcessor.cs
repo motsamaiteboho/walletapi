@@ -19,6 +19,7 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             _paymentProcessor = paymentProcessor;
         }
 
+        // Forwards the withdrawal event to the configured payment processor.
         public Task ProcessAsync(
             WalletWithdrawalEvent withdrawalEvent,
             Guid eventId,

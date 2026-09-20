@@ -40,6 +40,9 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             _logger = logger;
         }
 
+        // Executes a withdrawal for the specified wallet account.
+        // Validates idempotency, applies domain logic, records a transaction,
+        // publishes an event and saves changes atomically.
     public async Task<WithdrawWalletResponse?> ExecuteAsync(
         Guid walletAccountId,
         WithdrawWalletRequest request,
@@ -181,6 +184,8 @@ namespace Wallet.Application.Features.WalletAccounts.Withdraw
             return response;
         }
 
+        // Creates a deterministic hash for the withdrawal request. Currently
+        // normalizes the amount and computes a SHA256 hex string.
         private static string CreateRequestHash( WithdrawWalletRequest request)
         {
             var normalizedAmount =

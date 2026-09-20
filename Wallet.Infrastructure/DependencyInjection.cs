@@ -19,6 +19,8 @@ namespace Wallet.Infrastructure
 {
     public static class DependencyInjection
     {
+        // Registers infrastructure services like DbContext, repositories and
+        // event publishers into the DI container.
         public static IServiceCollection AddInfrastructure(
             this IServiceCollection services,
             IConfiguration configuration)
